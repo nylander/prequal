@@ -42,6 +42,7 @@ COptions::COptions(int argc, char *argv[]) {
 					cout << "\n\t-removeall       \t: Remove all residues rather than those outside the core region \n\t\t\t\t\t[DEFAULT residues in core filtered with " << CoreFilter() <<"]";
 					cout << "\n\t-corefilter X    \t: The character outputted in the core for the  filtered alignment [DEFAULT is "<< CoreFilter() << "]";
 					cout << "\n\t-noremoverepeat  \t: Do not remove repeated regions of length >" << _repeatLength << ". Repeats break PPs!";
+					cout << "\n\t-nodna           \t: Enforces banning of dna sequences. The program will fail if only DNA is input.";
 					cout << "\n\nOptions affecting output formats:";
 					cout << "\n\t-outsuffix X     \t: Output file will be the original name with X as a suffix [DEFAULT " << OutSuffix() << "]";
 					cout << "\n\t-dosummary       \t: Output summary statistics to file suffixed with " << SummarySuffix();
@@ -94,6 +95,8 @@ COptions::COptions(int argc, char *argv[]) {
 			_coreFilter = argv[++i][0];
 		} else if(strcmp(argv[i], "-noremoverepeat") == 0) {
 			_removeRepeat = false;
+		} else if(strcmp(argv[i], "-nodna") == 0) {
+			_allowDNA = false;
 		}
 		//////////// File stuff
 		else if (strcmp(argv[i], "-outsuffix") == 0) {

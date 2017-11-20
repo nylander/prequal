@@ -72,6 +72,8 @@ public:
 	// 6. Repeat handling
 	bool RemoveRepeat() { return _removeRepeat; }
 	int RepeatLength() { return _repeatLength; }
+	// 7. DNA handling
+	bool AllowDNA() { return _allowDNA; }
 private:
 	// Behaviour defining core and how the different parts are treated/filtered
 	int _runBeforeInside = 3;			// Number of positively defined homologies before a sequence is consider part of the core
@@ -80,6 +82,7 @@ private:
 	char _coreFilter = 'X';			// The character used for filtering in the core
 	bool _removeRepeat = true;			// Whether repeats are classified as removed prior to analysis
 	int _repeatLength = 20;				// The default length to specify a repeat
+	bool _allowDNA = true;				// Whether DNA sequences are allowed or not
 	// File handling
 	std::string _inputFile;
 	std::string _outputSuffix = ".filtered";

@@ -59,16 +59,41 @@ bool CSequence::Filter(int pos) {
 	if(Remove[pos] || !Inside[pos]) { return true; }
 	return false;
 }
+string CSequence::RealDNA(int pos) { // Real codon at position pos
+	if(pos == -1) { return _dna_seq; }
+	if(pos > length()) { cout << "\nPosition must be within amino acid sequence for RealDNA output"; }
+	return _dna_seq.substr(pos*3,3);
+}
+string CSequence::DNA(int pos, bool filter, bool showOutside) { // Filtered codon at position pos
+	std::stringstream ss;
+	if(pos != -1) {
+		if(pos > length()) { cout << "\nPosition must be within amino acid sequence for RealDNA output"; }
+		if(!showOutside && !Inside[pos]) { ss << "0" << "0" << "0"; }
+		else if(filter && Remove[pos]) { if(_filterOut != '\0') { ss <<_filterOut << _filterOut << _filterOut; } }
+		else { ss << _dna_seq.substr(pos*3,3); }
+	} else {
+		for( int i = 0 ; i < length(); i++) {
+			if(!showOutside && !Inside[i]) { continue; }
+			if(filter && Remove[i]) { if(_filterOut != '\0') { ss <<_filterOut << _filterOut << _filterOut; } }
+			else { ss << _dna_seq.substr(i*3,3); }
+		}
+	}
+	return ss.str();
+}
+
 
 // Function that examines a sequence and looks for self repeats
 // ---
 // This might be better served by a suffix tree implementation, but I'm just doing the dumb thing for now
 bool CSequence::CleanRepeat(int repeatLength) {
 	string seq = _seq;
+	string dna = _dna_seq;
 	bool foundRepeat = false;
 	int end;
 	for(int pos = 0; pos < seq.size() - repeatLength; pos ++) {
 		string repeat = seq.substr(pos,repeatLength);
+		// Repeat can never contain X
+		if(find(repeat.begin(),repeat.end(),'X') != repeat.end()) { continue; }
 		size_t next_pos= pos + repeatLength;
 		while(next_pos != string::npos) {
 			next_pos = seq.find(repeat,next_pos);
@@ -78,10 +103,43 @@ bool CSequence::CleanRepeat(int repeatLength) {
 				if(seq[pos + end + repeatLength] != seq[next_pos + end + repeatLength]) { break; }
 			}
 			seq.erase(next_pos,repeatLength + end);
+			if(!dna.empty()) {
+				dna.erase(next_pos*3,(repeatLength + end)*3);
+			}
 		}
 	}
-	if(foundRepeat) { _seq = seq; }
+	if(foundRepeat) { _seq = seq; _dna_seq = dna; }
 	return foundRepeat;
+}
+
+// Translation functions
+bool CSequence::MakeBestTranslation() {
+	// Check the sequence is in triplets and suitable for translation
+	if(length() % 3 != 0) { cout << "\nTrying to translate " << Name() << ", but not in a multiple of three\n\n"; exit(-1); }
+	for(int i = 0; i < NumGenCode; i++) {
+		if(TryTranslation(i)) { return true; }
+	}
+	return false;
+}
+bool CSequence::TryTranslation(int genCode) {
+	if(_genCode != -1) { cout << "\nTrying translation when sequence is already translated\n"; exit(-1); }
+	string codon;
+	string aa_seq;
+	bool okay;
+	int cod_num;
+	for(int i = 0 ; i < length(); i+=3) {
+		codon = _seq.substr(i,3);
+		okay = true;
+		for(auto &s : codon) { if(IsGap(s) || toupper(s) == 'N') { okay = false; aa_seq.push_back('X'); break; } } // Check whether codon can be translated
+		if(!okay) { continue; }
+		cod_num = GenCodes[genCode][GetCodon(codon)];
+		if(cod_num == -1) { return false; }
+		aa_seq.push_back(AA_ABET[cod_num]);
+	}
+	_dna_seq = _seq;
+	_seq = aa_seq;
+	_genCode = genCode;
+	return true;
 }
 
 
@@ -116,6 +174,23 @@ std::vector <CSequence> *FASTAReader(std::string SeqFile) {
     }
     // Add the final sequence
     RetSeq->push_back(CSequence(RemoveWhiteSpace(name),RemoveWhiteSpace(content)));
+    // Check whether all DNA
+    bool allDNA = true;
+    for(auto & seq : *RetSeq) {
+    	for(auto & s : seq.Seq()) {
+    		if(IsGap(s)) { continue; }
+    		if(!IsDNA(s)) { allDNA = false; break; }
+    	}
+    	if(!allDNA) { break; }
+    }
+    if(allDNA) {
+    	cout << "\nFound only DNA sequences. Doing translations.";
+    	for(auto & seq : *RetSeq) {
+    		if(!seq.MakeBestTranslation()) {
+    			cout << "\nFound DNA sequences, but cannot find a successful translation... abandoning!\n\n"; exit(-1);
+    		}
+    	}
+    }
     return RetSeq;
 }
 

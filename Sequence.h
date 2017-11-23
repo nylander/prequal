@@ -19,6 +19,8 @@
 #include <sstream>
 #include <string>
 
+extern std::stringstream warningStream;
+
 // Alphabet checker
 inline bool IsABET(char &c, const std::string &ABET) { if(find(ABET.begin(),ABET.end(),toupper(c)) == ABET.end()) { return false; } return true; };
 // Gap alphabet
@@ -36,7 +38,7 @@ inline int GetCodon(std::string codon) {
 	int pos;
 	if(codon.size() != 3) { std::cout << "\nWrong codon size. Developer problem?\n"; exit(-1); }
 	for(pos = 0; pos < COD_ABET.size(); pos+=3) {
-		if(COD_ABET[pos+0] == toupper(codon[0]) && COD_ABET[pos+1] && toupper(codon[1]) && COD_ABET[pos+2] == toupper(codon[2])) { break; }
+		if(COD_ABET[pos+0] == toupper(codon[0]) && COD_ABET[pos+1] == toupper(codon[1]) && COD_ABET[pos+2] == toupper(codon[2])) { break; }
 	}
 	if(pos == COD_ABET.size()) { std::cout << "\nUnknown codon. Is it DNA? Developer problem?\n"; exit(-1); }
 	return pos/3;
@@ -169,7 +171,7 @@ public:
 		for(auto &seq : *seqs) { if(seq.length() > _maxLength) { _maxLength = seq.length(); } }
 	};
 	// Handle translations
-	bool MakeBestTranslation();
+	bool MakeTranslation(bool forceUniversal = false);
 	bool HasDNA() { if (_genCode == -1) { return false; } return true; }
 	std::string RealDNA(int pos = -1);	// Matches the RealSeq command, but for DNA (codons)
 	std::string DNA(int pos = -1, bool filter = true, bool showOutside = false); // Matches the Seq command but for DNA (codons)
@@ -201,12 +203,12 @@ private:
 		Remove.assign(_seq.size(),false);
 	}
 
-	bool TryTranslation(int genCode);
+	bool TryTranslation(int genCode, bool force = false);	// Translate to genetic code genCode, if force then internal stops set to X
 
 };
 
 // File reader
-std::vector <CSequence> *FASTAReader(std::string SeqFile);
+std::vector <CSequence> *FASTAReader(std::string SeqFile, bool forceUniversal = false);
 
 // Other minor tools
 template <class TRange> bool InRange(TRange Val, TRange LowerBound, TRange UpperBound) { return ( !(Val < LowerBound) && ( Val < UpperBound) ); }

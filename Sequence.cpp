@@ -113,15 +113,20 @@ bool CSequence::CleanRepeat(int repeatLength) {
 }
 
 // Translation functions
-bool CSequence::MakeBestTranslation() {
+bool CSequence::MakeTranslation(bool forceUniversal) {
 	// Check the sequence is in triplets and suitable for translation
 	if(length() % 3 != 0) { cout << "\nTrying to translate " << Name() << ", but not in a multiple of three\n\n"; exit(-1); }
-	for(int i = 0; i < NumGenCode; i++) {
-		if(TryTranslation(i)) { return true; }
+
+	if(forceUniversal) {
+		if(TryTranslation(0,true)) { return true; }
+	} else {
+		for(int i = 0; i < NumGenCode; i++) {
+			if(TryTranslation(i)) { return true; }
+		}
 	}
 	return false;
 }
-bool CSequence::TryTranslation(int genCode) {
+bool CSequence::TryTranslation(int genCode, bool force) {
 	if(_genCode != -1) { cout << "\nTrying translation when sequence is already translated\n"; exit(-1); }
 	string codon;
 	string aa_seq;
@@ -133,7 +138,17 @@ bool CSequence::TryTranslation(int genCode) {
 		for(auto &s : codon) { if(IsGap(s) || toupper(s) == 'N') { okay = false; aa_seq.push_back('X'); break; } } // Check whether codon can be translated
 		if(!okay) { continue; }
 		cod_num = GenCodes[genCode][GetCodon(codon)];
-		if(cod_num == -1) { return false; }
+		if(cod_num == -1) {
+			if(force) { aa_seq.push_back('X'); continue; }
+			else { // Last codon or force allowed to be a stop codon
+				if(i + 3 >= length()) {
+					_seq.erase(i,3);
+					warningStream << "\nWARNING: " << Name() << " has has stop codon at end of sequence removed";
+					break;
+				}
+				else { return false; }
+			}
+		}
 		aa_seq.push_back(AA_ABET[cod_num]);
 	}
 	_dna_seq = _seq;
@@ -145,7 +160,7 @@ bool CSequence::TryTranslation(int genCode) {
 
 /////////////// Minor functions
 // File reader
-std::vector <CSequence> *FASTAReader(std::string SeqFile) {
+std::vector <CSequence> *FASTAReader(std::string SeqFile, bool forceUniversal) {
 	std::vector <CSequence> *RetSeq = new std::vector<CSequence>();
 
 	std::ifstream input(SeqFile.c_str(), std::ifstream::in);
@@ -186,7 +201,7 @@ std::vector <CSequence> *FASTAReader(std::string SeqFile) {
     if(allDNA) {
     	cout << "\nFound only DNA sequences. Doing translations.";
     	for(auto & seq : *RetSeq) {
-    		if(!seq.MakeBestTranslation()) {
+    		if(!seq.MakeTranslation(forceUniversal)) {
     			cout << "\nFound DNA sequences, but cannot find a successful translation... abandoning!\n\n"; exit(-1);
     		}
     	}

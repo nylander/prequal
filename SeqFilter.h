@@ -23,6 +23,8 @@ const std::string PROGRAM_NAME = "seqfilter";
 const std::string VERSION_NUMBER = "0.04a";
 #define DEFAULT_THRESHOLD 0.99
 
+extern std::stringstream warningStream;
+
 // Class holding the options for the program. Implemented in Options.cpp
 class COptions {
 public:
@@ -74,6 +76,7 @@ public:
 	int RepeatLength() { return _repeatLength; }
 	// 7. DNA handling
 	bool AllowDNA() { return _allowDNA; }
+	bool AlwaysUniversal() { return _alwaysUniversal; }
 private:
 	// Behaviour defining core and how the different parts are treated/filtered
 	int _runBeforeInside = 3;			// Number of positively defined homologies before a sequence is consider part of the core
@@ -82,7 +85,9 @@ private:
 	char _coreFilter = 'X';			// The character used for filtering in the core
 	bool _removeRepeat = true;			// Whether repeats are classified as removed prior to analysis
 	int _repeatLength = 20;				// The default length to specify a repeat
+	// DNA handling
 	bool _allowDNA = true;				// Whether DNA sequences are allowed or not
+	bool _alwaysUniversal = false;      // Whether to always use the universal genetic code for translations
 	// File handling
 	std::string _inputFile;
 	std::string _outputSuffix = ".filtered";

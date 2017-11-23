@@ -41,7 +41,7 @@ int main(int argc, char * argv[]) {
 	vector<double> values;							// Generic vector for moving around values
 
 	// Read data and sort initialisation
-	data = FASTAReader(options->Infile()); // Reads the sequences
+	data = FASTAReader(options->Infile(),options->AlwaysUniversal()); // Reads the sequences
 	cout << "\nThere are " << data->size() << " sequences of max length " << CSequence::MaxLength();
 	// Some error checking with regard to DNA sequences
 	for(auto & seq : *data) {
@@ -164,9 +164,7 @@ int main(int argc, char * argv[]) {
 
 	}
 
-	cout << "\n\nComputation complete\n";
-	// Output any warnings in an obvious place;
-	cout << warningStream.str();
+	cout << "\n\nComputation complete";
 	// Make nice summary of information
 	cout << "\n\n===================== Summary ======================";
 	cout << "\n              " << std::setw(12) << "Original" << std::setw(12) << "Filtered" << std::setw(12) << "%Retained";
@@ -212,7 +210,15 @@ int main(int argc, char * argv[]) {
 		summary_out << "\n\n";
 		summary_out.close();
 	}
-
+	// Output warnings if required
+	if(warningStream.rdbuf()->in_avail() != 0) {
+		string warningFile = options->Infile() + ".warning";
+		cout << "Analysis may have some problems. Warnings output to " << warningFile << "\n\n";
+		ofstream warnOut(warningFile);
+		warnOut << warningStream.str();
+		warnOut.close();
+	}
+	cout << "Filtering complete!\n";
 	// Clean up memory
 	for(int i = 0; i < data->size(); i++) { delete [] PP[i];  } delete [] PP;
 	delete data;
@@ -246,7 +252,7 @@ double TargetCutoff(double prop2Keep, ostream &os) {
 }
 
 void DoFiltering(double threshold) {
-	cout << "\n\nPerforming filtering";
+	cout << "\n\nPerforming filtering:";
 	cout << "\n\tApplying standard threshold " << threshold;
 	int thresholdCount = 0;
 	int ignoreCount = 0;
@@ -321,7 +327,6 @@ void DoFiltering(double threshold) {
 		data->at(i).CalculateSummary();
 	}
 	if(ignoreCount > 0) { cout << "\n\tThere were " << ignoreCount << " sequences ignored by filtering due to word/name lists"; }
-	cout << "\n\t... done" << flush;
 }
 
 double mean(vector <double> vec) {

@@ -135,7 +135,13 @@ bool CSequence::TryTranslation(int genCode, bool force) {
 	for(int i = 0 ; i < length(); i+=3) {
 		codon = _seq.substr(i,3);
 		okay = true;
-		for(auto &s : codon) { if(IsGap(s) || toupper(s) == 'N') { okay = false; aa_seq.push_back('X'); break; } } // Check whether codon can be translated
+		for(auto &s : codon) {
+			if(s == '?' || toupper(s )== 'X' || toupper(s) == 'N') { // Checks for ambiguity characters, but may miss some weirder ones
+				okay = false; aa_seq.push_back('X'); break;
+			} else if(IsGap(s)) { // If it's a gap then push out a gap
+				okay = false; aa_seq.push_back('-'); break;
+			}
+		} // Check whether codon can be translated
 		if(!okay) { continue; }
 		cod_num = GenCodes[genCode][GetCodon(codon)];
 		if(cod_num == -1) {

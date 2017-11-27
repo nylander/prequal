@@ -208,7 +208,8 @@ std::vector <CSequence> *FASTAReader(std::string SeqFile, bool forceUniversal) {
     	cout << "\nFound only DNA sequences. Doing translations.";
     	for(auto & seq : *RetSeq) {
     		if(!seq.MakeTranslation(forceUniversal)) {
-    			cout << "\nFound DNA sequences, but cannot find a successful translation... abandoning!\n\n"; exit(-1);
+    			cout << "\nFound DNA sequences, but cannot find a successful translation... abandoning!";
+    			cout << "\nSequence failed: " << seq.Name() << "\n\n"; exit(-1);
     		}
     	}
     }

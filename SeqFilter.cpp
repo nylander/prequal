@@ -150,7 +150,7 @@ int main(int argc, char * argv[]) {
 			outDNA << endl << seq.DNA() << endl;
 		}
 		outDNA.close();
-		outDNAfile = options->Infile() + ".translation" + options->OutSuffix();
+		outDNAfile = options->Infile() + ".translation";
 		cout << "\n\tOutputting DNA translation information to " << outDNAfile;
 		ofstream outTrans(outDNAfile);
 		for(auto &seq : *data) {

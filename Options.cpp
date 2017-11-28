@@ -19,7 +19,7 @@ COptions::COptions(int argc, char *argv[]) {
 			<< "\n----------------------------------------------------";
 	// Check basic input is matched
 	if (argc < 2) {
-		cout << "Incorrect command line. Usage: \n\t" << PROGRAM_NAME << " [options] input_file\n\t-h [all] for [full] options\n";
+		cout << "\n\nIncorrect command line. Usage: \n\t" << PROGRAM_NAME << " [options] input_file\n\t-h [all] for [full] options\n";
 		exit(-1);
 	}
 	// Get the input file
@@ -71,7 +71,7 @@ COptions::COptions(int argc, char *argv[]) {
 			cout << "\n\t-filterjoin X       \t: Extend filtering over regions of unfiltered sequence less than X [DEFAULT X = " << FilterRange() << "]";
 			cout << "\n\t-nofilterlist X     \t: Specify a file X that contains a list of taxa names that will \n\t\t\t\t\tnot be filtered. In X one name per line.";
 			cout << "\n\nUsage:\n\t" << PROGRAM_NAME << " [options] input_file";
-			cout << "\nTypical usage:\n\t " << PROGRAM_NAME << " -filterprop 0.85 input_file\n\n";
+			cout << "\nTypical usage (should do a good job with most sequences):\n\t " << PROGRAM_NAME << " input_file\n\n";
 			exit(-1);
 		}
 		/////////// Core stuff

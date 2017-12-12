@@ -1,5 +1,5 @@
 # PREQUAL - A pre-alignment quality filter
-Written by Simon Whelan in collaboration with Fabien Burki and Iser Irisarri
+Written by Simon Whelan in collaboration with Fabien Burki and Iker Irisarri
 
 A program to identify and mask regions with non-homologous adjacent characters in FASTA files. The following is just the -h all option with some more description. This problem uses extensive code from [Zorro](https://phylogenomics.me/software/zorro/) and [PaHMM-Tree](https://github.com/marbogusz/paHMM-Tree) and is distributed under a GPL v3.0. Please see the manual for more detailed information about functionality and settings.
 

@@ -290,7 +290,7 @@ void DoFiltering(double threshold) {
 		cout << " ... " << filter_count << " additional regions removed" << flush;
 	}
 	// Tidy the front and back
-	if(options->RunBeforeInside() > 0) {
+	if(options->RunBeforeInside() > 0 && options->Remove2Core()) {
 		cout << "\n\tApplying front/back trimming for runs of " << options->RunBeforeInside();
 		int seqTrimmed = 0;
 		for (int i = 0; i < data->size(); i++) {

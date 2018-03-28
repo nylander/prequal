@@ -152,7 +152,7 @@ public:
 	std::vector <bool> Inside;					// Whether the character is on the inside or outside
 	std::vector <bool> Remove;					// Whether to remove in the filter (true = remove)
 	double PropInside;							// The proportion of the sequence labeled inside
-	double PropRemoved;							// The proportion of hte sequence labeled to be removed
+	double PropRemoved;							// The proportion of the sequence labeled to be removed
 	bool AllRemoved() { return _allRemoved; }
 	void AddSequence(std::string seq);
 	void AddName(std::string name);
@@ -163,7 +163,7 @@ public:
 	std::string Seq(int pos = -1, bool filter = true, bool showOutside = false);		// Output the sequence (or pos i of sequence)
 	std::string Name() { return _name; }
 	bool Filter(int pos);						// Whether pos should be filtered/removed in any way
-	// Checks whther a sequence has a repeat; Filter = whether to set for removal; repeatLength = number of characters specified for repeat
+	// Checks whether a sequence has a repeat; Filter = whether to set for removal; repeatLength = number of characters specified for repeat
 	bool CleanRepeat(int repeatLength = 20);
 	// Resets the maxLength if needed
 	static void ResetMaxLength(std::vector <CSequence> *seqs) {

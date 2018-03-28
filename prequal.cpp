@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <iomanip>
+#include <cmath>
 #include "prequal.h"
 #include "Sequence.h"
 #include "ZorroInterface.h"
@@ -55,7 +56,8 @@ int main(int argc, char * argv[]) {
 			int oriLength = data->at(i).length();
 			if(data->at(i).CleanRepeat(options->RepeatLength())) {
 				repeated = true;
-				warningStream << "\nWARNING: repeat found in sequence["<<i<<"] " << data->at(i).Name();
+				//warningStream << "\nWARNING: repeat found in sequence["<<i<<"] " << data->at(i).Name();
+				warningStream << "\nWARNING: " << data->at(i).Name() << " " << "repeat found in sequence["<<i<<"]";
 				warningStream << "\n\tLength changed from " << oriLength << " -> " << data->at(i).length();
 			}
 		}
@@ -119,11 +121,13 @@ int main(int argc, char * argv[]) {
 		if(data->at(i).HasDNA()) { hasDNA = true; }
 		total_char += data->at(i).length();
 		if(data->at(i).AllRemoved()) {
-			warningStream << "\nWARNING: Fully removed sequence [ "<<i<<"] " << data->at(i).Name();
+			//warningStream << "\nWARNING: Fully removed sequence [ "<<i<<"] " << data->at(i).Name();
+			warningStream << "\nWARNING: " << data->at(i).Name() << " " << "Whole sequence removed ["<<i<<"]";
 			continue;
 		}
-		if(data->at(i).PropRemoved > 0.25) {
-			warningStream << "\nWARNING: " << fixed << setprecision(2) <<  data->at(i).PropRemoved * 100 << "% of sequence removed/missing for ["<<i<<"] " << data->at(i).Name();
+		if(data->at(i).PropRemoved > 0.25) { // would be handy to have this treshold as a command line parameter
+			//warningStream << "\nWARNING: " << fixed << setprecision(2) <<  data->at(i).PropRemoved * 100 << "% of sequence removed/missing for ["<<i<<"] " << data->at(i).Name();
+			warningStream << "\nWARNING: " << data->at(i).Name() << " " << fixed << setprecision(2) <<  data->at(i).PropRemoved * 100 << "% of sequence removed/missing for ["<<i<<"] ";
 		}
 		output_seq++;
 		sequence_out << ">" << data->at(i).Name() << endl;

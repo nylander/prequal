@@ -115,8 +115,11 @@ bool CSequence::CleanRepeat(int repeatLength) {
 // Translation functions
 bool CSequence::MakeTranslation(bool forceUniversal) {
 	// Check the sequence is in triplets and suitable for translation
-	if(length() % 3 != 0) { cout << "\nTrying to translate " << Name() << ", but not in a multiple of three\n\n"; exit(-1); }
-
+	//if(length() % 3 != 0) { cout << "\nTrying to translate " << Name() << ", but not in a multiple of three\n\n"; exit(-1); }
+	if(length() % 3 != 0) {
+        cout << "\nWARNING: " << Name() << " Trying to translate, but not in a multiple of three\n\n";
+        exit(-1);
+    }
 	if(forceUniversal) {
 		if(TryTranslation(0,true)) { return true; }
 	} else {
@@ -149,7 +152,7 @@ bool CSequence::TryTranslation(int genCode, bool force) {
 			else { // Last codon or force allowed to be a stop codon
 				if(i + 3 >= length()) {
 					_seq.erase(i,3);
-					warningStream << "\nWARNING: " << Name() << " has has stop codon at end of sequence removed";
+					warningStream << "\nWARNING: " << Name() << " removed stop codon at end of sequence";
 					break;
 				}
 				else { return false; }
@@ -206,12 +209,20 @@ std::vector <CSequence> *FASTAReader(std::string SeqFile, bool forceUniversal) {
     }
     if(allDNA) {
     	cout << "\nFound only DNA sequences. Doing translations.";
+        bool noTrans = false;
     	for(auto & seq : *RetSeq) {
     		if(!seq.MakeTranslation(forceUniversal)) {
-    			cout << "\nFound DNA sequences, but cannot find a successful translation... abandoning!";
-    			cout << "\nSequence failed: " << seq.Name() << "\n\n"; exit(-1);
+                //cout << "\nFound DNA sequences, but cannot find a successful translation... abandoning!";
+    			//cout << "\nSequence failed: " << seq.Name() << "\n\n";
+    			cout << "\nWARNING: " << seq.Name() << " Sequence translation failed!";
+                //exit(-1);
+                noTrans = true;
     		}
     	}
+        if (noTrans == true) {
+            cout << "\nFound DNA sequences, but cannot find a successful translation... abandoning!" << "\n\n";
+            exit(-1);
+        }
     }
     return RetSeq;
 }
